@@ -13,15 +13,11 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
+import javax.swing.table.*;
 
 public class VentanaPrincipal extends JFrame {
 
-    // =====================================================
     // IDENTIDAD VISUAL
-    // =====================================================
 
     private static final Color AZUL = new Color(24, 71, 105);
     private static final Color AZUL_OSCURO = new Color(19, 60, 91);
@@ -40,35 +36,26 @@ public class VentanaPrincipal extends JFrame {
             DateTimeFormatter.ofPattern("dd/MM/uuuu")
                     .withResolverStyle(ResolverStyle.STRICT);
 
-    // =====================================================
     // CONTROLADOR Y NAVEGACIÓN
-    // =====================================================
 
     private final ControladorHospital controlador =
             new ControladorHospital();
 
     private final CardLayout tarjetas = new CardLayout();
-
     private final JPanel contenido = new JPanel(tarjetas);
-
     private final JLabel subtitulo = new JLabel("Inicio");
 
     private final Map<String, JButton> botonesMenu =
             new LinkedHashMap<>();
 
-    private String paginaActual = "Inicio";
-
-    // =====================================================
     // MODELOS DE TABLAS
-    // =====================================================
 
     private final DefaultTableModel modeloPacientes =
             modelo("ID", "Documento", "Nombre", "Apellido",
                     "Teléfono", "Email", "Estado");
 
     private final DefaultTableModel modeloProfesionales =
-            modelo("ID", "Nombre", "Apellido",
-                    "Especialidad", "Estado");
+            modelo("ID", "Nombre", "Apellido", "Especialidad", "Estado");
 
     private final DefaultTableModel modeloDisponibilidad =
             modelo("ID", "Fecha", "Hora", "Profesional",
@@ -76,13 +63,11 @@ public class VentanaPrincipal extends JFrame {
 
     private final DefaultTableModel modeloTurnos =
             modelo("ID", "DNI", "Paciente", "Especialidad",
-                    "Profesional", "Fecha", "Hora",
-                    "Lugar", "Estado");
+                    "Profesional", "Fecha", "Hora", "Lugar", "Estado");
 
     private final DefaultTableModel modeloHistorial =
             modelo("ID", "DNI", "Paciente", "Especialidad",
-                    "Profesional", "Fecha", "Hora",
-                    "Lugar", "Estado");
+                    "Profesional", "Fecha", "Hora", "Lugar", "Estado");
 
     private final JTable tablaPacientes = tabla(modeloPacientes);
     private final JTable tablaProfesionales = tabla(modeloProfesionales);
@@ -90,9 +75,7 @@ public class VentanaPrincipal extends JFrame {
     private final JTable tablaTurnos = tabla(modeloTurnos);
     private final JTable tablaHistorial = tabla(modeloHistorial);
 
-    // =====================================================
     // FILTROS
-    // =====================================================
 
     private final JCheckBox pacientesInactivos =
             new JCheckBox("Ver inactivos");
@@ -102,12 +85,9 @@ public class VentanaPrincipal extends JFrame {
 
     private final JComboBox<String> filtroEspecialidad = combo();
     private final JComboBox<String> filtroProfesional = combo();
-
     private final JTextField filtroFecha = campo(11);
 
-    // =====================================================
     // DATOS
-    // =====================================================
 
     private List<Paciente> listaPacientes = new ArrayList<>();
     private List<Profesional> listaProfesionales = new ArrayList<>();
@@ -117,9 +97,7 @@ public class VentanaPrincipal extends JFrame {
 
     private boolean cargando = false;
 
-    // =====================================================
     // CONSTRUCTOR
-    // =====================================================
 
     public VentanaPrincipal() {
 
@@ -143,7 +121,6 @@ public class VentanaPrincipal extends JFrame {
         JLabel encabezado = new JLabel(
                 "SISTEMA DE GESTIÓN DE TURNOS Y COMUNICACIÓN CON PACIENTES"
         );
-
         encabezado.setForeground(AZUL);
         encabezado.setFont(
                 new Font("Segoe UI", Font.BOLD, 17)
@@ -190,22 +167,15 @@ public class VentanaPrincipal extends JFrame {
         });
 
         actualizar();
-
         mostrarPagina("Inicio");
     }
 
-    // =====================================================
     // MENÚ LATERAL
-    // =====================================================
 
     private JPanel crearMenuLateral() {
 
         JPanel lateral = new JPanel();
-
-        lateral.setLayout(
-                new BoxLayout(lateral, BoxLayout.Y_AXIS)
-        );
-
+        lateral.setLayout(new BoxLayout(lateral, BoxLayout.Y_AXIS));
         lateral.setBackground(AZUL);
         lateral.setPreferredSize(new Dimension(245, 0));
         lateral.setBorder(new EmptyBorder(28, 15, 20, 15));
@@ -216,7 +186,6 @@ public class VentanaPrincipal extends JFrame {
         marca.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel hospital = new JLabel("Dr. Fernando Rocha");
-        hospital.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         hospital.setForeground(new Color(210, 232, 240));
         hospital.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -226,52 +195,33 @@ public class VentanaPrincipal extends JFrame {
         lateral.add(Box.createVerticalStrut(45));
 
         String[] secciones = {
-            "Inicio",
-            "Pacientes",
-            "Profesionales",
-            "Disponibilidad",
-            "Turnos",
-            "Historial"
+            "Inicio", "Pacientes", "Profesionales",
+            "Disponibilidad", "Turnos", "Historial"
         };
 
         for (String seccion : secciones) {
 
             JButton boton = new JButton("  " + seccion);
-
-            boton.setFont(
-                    new Font("Segoe UI", Font.BOLD, 14)
-            );
-
+            boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
             boton.setForeground(AZUL);
             boton.setBackground(Color.WHITE);
-
-            boton.setOpaque(true);
-            boton.setContentAreaFilled(true);
             boton.setFocusPainted(false);
-            boton.setBorderPainted(true);
-
+            boton.setOpaque(true);
             boton.setBorder(
                     BorderFactory.createCompoundBorder(
                             BorderFactory.createLineBorder(BORDE),
                             new EmptyBorder(13, 13, 13, 13)
                     )
             );
-
             boton.setHorizontalAlignment(SwingConstants.LEFT);
             boton.setMaximumSize(
                     new Dimension(Integer.MAX_VALUE, 49)
             );
-
             boton.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            boton.setCursor(
-                    Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-            );
 
             boton.addActionListener(e -> mostrarPagina(seccion));
 
             botonesMenu.put(seccion, boton);
-
             lateral.add(boton);
             lateral.add(Box.createVerticalStrut(9));
         }
@@ -281,24 +231,19 @@ public class VentanaPrincipal extends JFrame {
 
     private void mostrarPagina(String pagina) {
 
-        paginaActual = pagina;
-
         tarjetas.show(contenido, pagina);
         subtitulo.setText(pagina);
 
         for (Map.Entry<String, JButton> entrada
                 : botonesMenu.entrySet()) {
 
-            JButton boton = entrada.getValue();
-
             boolean seleccionado =
                     entrada.getKey().equals(pagina);
 
-            boton.setBackground(
+            entrada.getValue().setBackground(
                     seleccionado ? SELECCION : Color.WHITE
             );
-
-            boton.setForeground(AZUL_OSCURO);
+            entrada.getValue().setForeground(AZUL_OSCURO);
         }
 
         if (!"Inicio".equals(pagina)) {
@@ -306,9 +251,7 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    // =====================================================
-    // PANTALLA INICIO
-    // =====================================================
+    // INICIO
 
     private JPanel panelInicio() {
 
@@ -319,47 +262,27 @@ public class VentanaPrincipal extends JFrame {
         bienvenida.setLayout(
                 new BoxLayout(bienvenida, BoxLayout.Y_AXIS)
         );
-
         bienvenida.setBackground(Color.WHITE);
-        bienvenida.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(BORDE),
-                        new EmptyBorder(45, 45, 45, 45)
-                )
-        );
+        bienvenida.setBorder(new EmptyBorder(45, 45, 45, 45));
 
         JLabel titulo = new JLabel(
                 "Bienvenido al Sistema de Gestión de Turnos"
         );
-
-        titulo.setFont(
-                new Font("Segoe UI", Font.BOLD, 27)
-        );
-
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 27));
         titulo.setForeground(AZUL);
-        titulo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel institucion = new JLabel(
                 "Hospital Dr. Fernando Rocha"
         );
-
         institucion.setFont(
                 new Font("Segoe UI", Font.BOLD, 20)
         );
-
         institucion.setForeground(TURQUESA);
-        institucion.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel localidad = new JLabel(
                 "Luis Beltrán, Río Negro"
         );
-
-        localidad.setFont(
-                new Font("Segoe UI", Font.PLAIN, 15)
-        );
-
         localidad.setForeground(AZUL);
-        localidad.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JTextArea descripcion = new JTextArea(
                 "Este sistema permite gestionar pacientes, profesionales "
@@ -374,14 +297,11 @@ public class VentanaPrincipal extends JFrame {
         descripcion.setFont(
                 new Font("Segoe UI", Font.PLAIN, 16)
         );
-
         descripcion.setForeground(AZUL);
-        descripcion.setBackground(Color.WHITE);
         descripcion.setEditable(false);
         descripcion.setLineWrap(true);
         descripcion.setWrapStyleWord(true);
         descripcion.setFocusable(false);
-        descripcion.setAlignmentX(Component.LEFT_ALIGNMENT);
         descripcion.setMaximumSize(
                 new Dimension(Integer.MAX_VALUE, 170)
         );
@@ -394,11 +314,7 @@ public class VentanaPrincipal extends JFrame {
         bienvenida.add(Box.createVerticalStrut(30));
         bienvenida.add(descripcion);
 
-        JPanel accesos = new JPanel(
-                new FlowLayout(FlowLayout.LEFT, 12, 12)
-        );
-
-        accesos.setOpaque(false);
+        JPanel accesos = barra();
 
         JButton pacientes = crearBoton("Gestionar pacientes");
         pacientes.addActionListener(
@@ -412,7 +328,6 @@ public class VentanaPrincipal extends JFrame {
 
         JButton disponibilidad =
                 crearBoton("Consultar disponibilidad");
-
         disponibilidad.addActionListener(
                 e -> mostrarPagina("Disponibilidad")
         );
@@ -431,12 +346,9 @@ public class VentanaPrincipal extends JFrame {
         return panel;
     }
 
-    // =====================================================
     // COMPONENTES VISUALES
-    // =====================================================
 
     private static DefaultTableModel modelo(String... columnas) {
-
         return new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int fila, int columna) {
@@ -451,23 +363,18 @@ public class VentanaPrincipal extends JFrame {
 
         tabla.setFont(FUENTE);
         tabla.setRowHeight(35);
-
         tabla.setBackground(Color.WHITE);
         tabla.setForeground(AZUL_OSCURO);
         tabla.setGridColor(BORDE);
-
         tabla.setSelectionBackground(SELECCION);
         tabla.setSelectionForeground(AZUL);
-
         tabla.setSelectionMode(
                 ListSelectionModel.SINGLE_SELECTION
         );
-
         tabla.setAutoCreateRowSorter(true);
         tabla.setFillsViewportHeight(true);
 
         JTableHeader encabezado = tabla.getTableHeader();
-
         encabezado.setPreferredSize(new Dimension(10, 40));
         encabezado.setReorderingAllowed(false);
 
@@ -477,22 +384,10 @@ public class VentanaPrincipal extends JFrame {
         renderer.setBackground(AZUL);
         renderer.setForeground(Color.WHITE);
         renderer.setOpaque(true);
-
-        renderer.setFont(
-                new Font("Segoe UI", Font.BOLD, 13)
-        );
-
-        renderer.setHorizontalAlignment(
-                SwingConstants.LEFT
-        );
-
-        renderer.setBorder(
-                new EmptyBorder(8, 10, 8, 10)
-        );
+        renderer.setFont(FUENTE_BOTON);
+        renderer.setBorder(new EmptyBorder(8, 10, 8, 10));
 
         encabezado.setDefaultRenderer(renderer);
-        encabezado.setBackground(AZUL);
-        encabezado.setForeground(Color.WHITE);
 
         return tabla;
     }
@@ -504,20 +399,13 @@ public class VentanaPrincipal extends JFrame {
         boton.setFont(FUENTE_BOTON);
         boton.setForeground(AZUL);
         boton.setBackground(Color.WHITE);
-
-        boton.setOpaque(true);
-        boton.setContentAreaFilled(true);
         boton.setFocusPainted(false);
-
+        boton.setOpaque(true);
         boton.setBorder(
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(AZUL),
                         new EmptyBorder(10, 14, 10, 14)
                 )
-        );
-
-        boton.setCursor(
-                Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         );
 
         return boton;
@@ -526,14 +414,11 @@ public class VentanaPrincipal extends JFrame {
     private JTextField campo(int ancho) {
 
         JTextField campo = new JTextField(ancho);
-
         campo.setFont(
                 new Font("Segoe UI", Font.PLAIN, 14)
         );
-
         campo.setForeground(AZUL);
         campo.setBackground(Color.WHITE);
-
         campo.setBorder(
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(BORDE),
@@ -547,64 +432,19 @@ public class VentanaPrincipal extends JFrame {
     private JComboBox<String> combo() {
 
         JComboBox<String> combo = new JComboBox<>();
-
-        combo.setFont(
-                new Font("Segoe UI", Font.PLAIN, 14)
-        );
-
+        combo.setFont(FUENTE);
         combo.setForeground(AZUL);
         combo.setBackground(Color.WHITE);
-
-        combo.setOpaque(true);
         combo.setPreferredSize(new Dimension(200, 38));
-
-        combo.setRenderer(new DefaultListCellRenderer() {
-
-            @Override
-            public Component getListCellRendererComponent(
-                    JList<?> lista,
-                    Object valor,
-                    int indice,
-                    boolean seleccionado,
-                    boolean foco) {
-
-                JLabel etiqueta =
-                        (JLabel) super.getListCellRendererComponent(
-                                lista,
-                                valor,
-                                indice,
-                                seleccionado,
-                                foco
-                        );
-
-                etiqueta.setFont(FUENTE);
-                etiqueta.setOpaque(true);
-
-                etiqueta.setBorder(
-                        new EmptyBorder(7, 10, 7, 10)
-                );
-
-                etiqueta.setBackground(
-                        seleccionado ? SELECCION : Color.WHITE
-                );
-
-                etiqueta.setForeground(AZUL);
-
-                return etiqueta;
-            }
-        });
 
         return combo;
     }
 
     private JPanel barra() {
-
         JPanel panel = new JPanel(
                 new FlowLayout(FlowLayout.LEFT, 10, 8)
         );
-
         panel.setOpaque(false);
-
         return panel;
     }
 
@@ -614,11 +454,9 @@ public class VentanaPrincipal extends JFrame {
         panel.setBackground(FONDO);
 
         JScrollPane scroll = new JScrollPane(tabla);
-
         scroll.setBorder(
                 BorderFactory.createLineBorder(BORDE)
         );
-
         scroll.getViewport().setBackground(Color.WHITE);
 
         panel.add(controles, BorderLayout.NORTH);
@@ -634,14 +472,11 @@ public class VentanaPrincipal extends JFrame {
         JPanel panel = new JPanel(
                 new GridLayout(etiquetas.length, 2, 12, 12)
         );
-
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(18, 18, 18, 18));
 
         for (int i = 0; i < etiquetas.length; i++) {
-
             JLabel etiqueta = new JLabel(etiquetas[i]);
-
             etiqueta.setFont(FUENTE_BOTON);
             etiqueta.setForeground(AZUL);
 
@@ -653,7 +488,6 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private boolean aceptar(String titulo, JPanel formulario) {
-
         return JOptionPane.showConfirmDialog(
                 this,
                 formulario,
@@ -663,21 +497,16 @@ public class VentanaPrincipal extends JFrame {
         ) == JOptionPane.OK_OPTION;
     }
 
-    // =====================================================
     // UTILIDADES
-    // =====================================================
 
     private interface Trabajo {
         void run() throws Exception;
     }
 
     private void ejecutar(Trabajo trabajo) {
-
         try {
             trabajo.run();
-
         } catch (Exception ex) {
-
             JOptionPane.showMessageDialog(
                     this,
                     ex.getMessage(),
@@ -693,16 +522,11 @@ public class VentanaPrincipal extends JFrame {
             Trabajo trabajo) {
 
         JButton boton = crearBoton(texto);
-
-        boton.addActionListener(
-                e -> ejecutar(trabajo)
-        );
-
+        boton.addActionListener(e -> ejecutar(trabajo));
         panel.add(boton);
     }
 
     private void aviso(String mensaje) {
-
         JOptionPane.showMessageDialog(
                 this,
                 mensaje,
@@ -736,9 +560,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private static void requerido(String... valores) {
-
         for (String valor : valores) {
-
             if (valor == null || valor.isBlank()) {
                 throw new IllegalArgumentException(
                         "Completá los campos obligatorios."
@@ -752,7 +574,6 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private static String etiqueta(Profesional profesional) {
-
         return profesional.getIdProfesional()
                 + " - "
                 + profesional.getNombreCompleto()
@@ -761,28 +582,23 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private static int idDe(String texto) {
-
         return Integer.parseInt(
                 texto.substring(0, texto.indexOf(" - "))
         );
     }
 
     private static void configurarCheck(JCheckBox check) {
-
         check.setOpaque(false);
         check.setForeground(AZUL);
         check.setFont(FUENTE);
         check.setFocusPainted(false);
     }
 
-    // =====================================================
     // PACIENTES
-    // =====================================================
 
     private JPanel panelPacientes() {
 
         JPanel controles = barra();
-
         configurarCheck(pacientesInactivos);
 
         accion(controles, "Registrar paciente",
@@ -794,7 +610,6 @@ public class VentanaPrincipal extends JFrame {
         accion(controles, "Activar / desactivar", () -> {
 
             Paciente paciente = pacienteElegido();
-
             boolean activar = pacientesInactivos.isSelected();
 
             controlador.cambiarEstadoPaciente(
@@ -803,7 +618,6 @@ public class VentanaPrincipal extends JFrame {
             );
 
             actualizar();
-
             aviso(activar
                     ? "Paciente reactivado correctamente."
                     : "Paciente desactivado correctamente.");
@@ -829,7 +643,6 @@ public class VentanaPrincipal extends JFrame {
         });
 
         controles.add(pacientesInactivos);
-
         accion(controles, "Actualizar", this::actualizar);
 
         return panel(tablaPacientes, controles);
@@ -858,7 +671,6 @@ public class VentanaPrincipal extends JFrame {
         JTextField email = campo(18);
 
         if (paciente != null) {
-
             dni.setText(paciente.getDocumento());
             nombre.setText(paciente.getNombre());
             apellido.setText(paciente.getApellido());
@@ -885,11 +697,7 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
 
-        requerido(
-                valor(dni),
-                valor(nombre),
-                valor(apellido)
-        );
+        requerido(valor(dni), valor(nombre), valor(apellido));
 
         if (paciente == null) {
 
@@ -917,14 +725,11 @@ public class VentanaPrincipal extends JFrame {
         aviso("Paciente guardado correctamente.");
     }
 
-    // =====================================================
     // PROFESIONALES
-    // =====================================================
 
     private JPanel panelProfesionales() {
 
         JPanel controles = barra();
-
         configurarCheck(profesionalesInactivos);
 
         accion(controles, "Registrar profesional",
@@ -936,9 +741,7 @@ public class VentanaPrincipal extends JFrame {
         accion(controles, "Activar / desactivar", () -> {
 
             Profesional profesional = profesionalElegido();
-
-            boolean activar =
-                    profesionalesInactivos.isSelected();
+            boolean activar = profesionalesInactivos.isSelected();
 
             controlador.cambiarEstadoProfesional(
                     profesional.getIdProfesional(),
@@ -989,13 +792,11 @@ public class VentanaPrincipal extends JFrame {
             }
 
             controlador.registrarLugar(nombre, direccion);
-
             actualizar();
             aviso("Lugar de atención registrado.");
         });
 
         controles.add(profesionalesInactivos);
-
         accion(controles, "Actualizar", this::actualizar);
 
         return panel(tablaProfesionales, controles);
@@ -1019,7 +820,6 @@ public class VentanaPrincipal extends JFrame {
 
         JTextField nombre = campo(18);
         JTextField apellido = campo(18);
-
         JComboBox<String> especialidad = combo();
 
         for (String item : controlador.listarEspecialidades()) {
@@ -1027,10 +827,8 @@ public class VentanaPrincipal extends JFrame {
         }
 
         if (profesional != null) {
-
             nombre.setText(profesional.getNombre());
             apellido.setText(profesional.getApellido());
-
             especialidad.setSelectedItem(
                     profesional.getEspecialidad()
             );
@@ -1086,59 +884,46 @@ public class VentanaPrincipal extends JFrame {
         aviso("Profesional guardado correctamente.");
     }
 
-    // =====================================================
     // DISPONIBILIDAD
-    // =====================================================
 
-   
-private JPanel panelDisponibilidad() {
+    private JPanel panelDisponibilidad() {
 
-    JPanel controles = barra();
+        JPanel controles = barra();
 
-    JLabel especialidad = new JLabel("Especialidad");
-    JLabel profesional = new JLabel("Profesional");
-    JLabel fecha = new JLabel("Fecha");
+        controles.add(new JLabel("Especialidad"));
+        controles.add(filtroEspecialidad);
 
-    especialidad.setForeground(AZUL);
-    profesional.setForeground(AZUL);
-    fecha.setForeground(AZUL);
+        controles.add(new JLabel("Profesional"));
+        controles.add(filtroProfesional);
 
-    controles.add(especialidad);
-    controles.add(filtroEspecialidad);
+        controles.add(new JLabel("Fecha"));
 
-    controles.add(profesional);
-    controles.add(filtroProfesional);
+        filtroFecha.setToolTipText(
+                "Fecha dd/MM/aaaa. Vacío = todas."
+        );
 
-    filtroFecha.setToolTipText(
-            "Fecha dd/MM/aaaa. Vacío = todas."
-    );
+        controles.add(filtroFecha);
 
-    controles.add(fecha);
-    controles.add(filtroFecha);
+        accion(controles, "Filtrar",
+                this::filtrarDisponibilidad);
 
-    accion(controles, "Filtrar",
-            this::filtrarDisponibilidad);
+        accion(controles, "Generar turnos",
+                this::generarTurnos);
 
-    // Un solo botón para generar horarios automáticamente.
-    accion(controles, "Generar turnos",
-            this::generarTurnos);
+        accion(controles, "Bloquear / desbloquear",
+                this::bloquear);
 
-    accion(controles, "Bloquear / desbloquear",
-            this::bloquear);
+        accion(controles, "Actualizar",
+                this::actualizar);
 
-    accion(controles, "Actualizar",
-            this::actualizar);
-
-    return panel(tablaDisponibilidad, controles);
-}
-
+        return panel(tablaDisponibilidad, controles);
+    }
 
     private void cargarFiltroProfesionales() {
 
         cargando = true;
 
         try {
-
             String especialidad =
                     (String) filtroEspecialidad.getSelectedItem();
 
@@ -1163,64 +948,58 @@ private JPanel panelDisponibilidad() {
         }
     }
 
+    private void filtrarDisponibilidad() {
 
-private void filtrarDisponibilidad() {
+        ejecutar(() -> {
 
-    ejecutar(() -> {
+            String especialidad =
+                    (String) filtroEspecialidad.getSelectedItem();
 
-        String especialidad =
-                (String) filtroEspecialidad.getSelectedItem();
+            String profesional =
+                    (String) filtroProfesional.getSelectedItem();
 
-        String profesional =
-                (String) filtroProfesional.getSelectedItem();
+            LocalDate fecha = valor(filtroFecha).isBlank()
+                    ? null
+                    : LocalDate.parse(valor(filtroFecha), FECHA);
 
-        LocalDate fecha = valor(filtroFecha).isBlank()
-                ? null
-                : LocalDate.parse(valor(filtroFecha), FECHA);
+            Integer idProfesional =
+                    profesional == null || profesional.equals("Todos")
+                    ? null
+                    : idDe(profesional);
 
-        Integer idProfesional =
-                profesional == null || profesional.equals("Todos")
-                ? null
-                : idDe(profesional);
+            limpiar(modeloDisponibilidad);
 
-        limpiar(modeloDisponibilidad);
+            LocalDateTime ahora = LocalDateTime.now();
 
-        LocalDateTime ahora = LocalDateTime.now();
+            for (Disponibilidad disponibilidad
+                    : controlador.filtrarDisponibilidades(
+                            especialidad,
+                            idProfesional,
+                            fecha)) {
 
-        for (Disponibilidad disponibilidad
-                : controlador.filtrarDisponibilidades(
-                        especialidad,
-                        idProfesional,
-                        fecha)) {
+                LocalDateTime fechaHora = LocalDateTime.of(
+                        disponibilidad.getFecha(),
+                        disponibilidad.getHorario()
+                );
 
-            LocalDateTime fechaHora =
-                    LocalDateTime.of(
-                            disponibilidad.getFecha(),
-                            disponibilidad.getHorario()
-                    );
+                if (!fechaHora.isAfter(ahora)) {
+                    continue;
+                }
 
-            // No mostrar disponibilidades vencidas.
-            if (!fechaHora.isAfter(ahora)) {
-                continue;
+                modeloDisponibilidad.addRow(new Object[]{
+                    disponibilidad.getIdDisponibilidad(),
+                    disponibilidad.getFechaFormateada(),
+                    disponibilidad.getHoraFormateada(),
+                    disponibilidad.getProfesional()
+                            .getNombreCompleto(),
+                    disponibilidad.getProfesional()
+                            .getEspecialidad(),
+                    disponibilidad.getLugar(),
+                    disponibilidad.getEstado()
+                });
             }
-
-            modeloDisponibilidad.addRow(new Object[]{
-                disponibilidad.getIdDisponibilidad(),
-                disponibilidad.getFechaFormateada(),
-                disponibilidad.getHoraFormateada(),
-                disponibilidad.getProfesional()
-                        .getNombreCompleto(),
-                disponibilidad.getProfesional()
-                        .getEspecialidad(),
-                disponibilidad.getLugar(),
-                disponibilidad.getEstado()
-            });
-        }
-    });
-}
-
-
-    // Relaciona profesionales con su especialidad.
+        });
+    }
 
     private void llenarProfesionales(
             JComboBox<String> comboProfesionales,
@@ -1242,8 +1021,9 @@ private void filtrarDisponibilidad() {
         }
     }
 
-    private void crearHorario(boolean franja)
-            throws Exception {
+    // GENERACIÓN DE DISPONIBILIDADES
+
+    private void generarTurnos() throws Exception {
 
         JComboBox<String> especialidad = combo();
         JComboBox<String> profesional = combo();
@@ -1270,281 +1050,126 @@ private void filtrarDisponibilidad() {
         );
 
         JTextField fecha = campo(15);
-        JTextField inicio = campo(10);
-        JTextField fin = campo(10);
-        JTextField duracion = campo(10);
+        JTextField horaInicio = campo(10);
+        JTextField horaFin = campo(10);
 
         fecha.setText(
                 LocalDate.now().plusDays(1).format(FECHA)
         );
 
-        inicio.setText("08:00");
-        fin.setText("12:00");
-        duracion.setText("30");
+        horaInicio.setText("08:00");
+        horaFin.setText("12:00");
 
-        JPanel formulario;
+        JComboBox<String> intervalo = combo();
 
-        if (franja) {
+        intervalo.addItem("Cada 15 minutos");
+        intervalo.addItem("Cada 20 minutos");
+        intervalo.addItem("Cada 30 minutos");
+        intervalo.addItem("Cada 45 minutos");
+        intervalo.addItem("Cada 60 minutos");
 
-            formulario = formulario(
-                    new String[]{
-                        "Especialidad",
-                        "Profesional",
-                        "Lugar de atención",
-                        "Fecha (dd/MM/aaaa)",
-                        "Desde (HH:mm)",
-                        "Hasta (HH:mm)",
-                        "Minutos por turno"
-                    },
-                    especialidad,
-                    profesional,
-                    lugar,
-                    fecha,
-                    inicio,
-                    fin,
-                    duracion
-            );
+        intervalo.setSelectedItem("Cada 30 minutos");
 
-        } else {
+        JPanel formulario = formulario(
+                new String[]{
+                    "Especialidad",
+                    "Profesional",
+                    "Lugar de atención",
+                    "Fecha (dd/MM/aaaa)",
+                    "Hora de inicio (HH:mm)",
+                    "Hora de finalización (HH:mm)",
+                    "Intervalo entre turnos"
+                },
+                especialidad,
+                profesional,
+                lugar,
+                fecha,
+                horaInicio,
+                horaFin,
+                intervalo
+        );
 
-            formulario = formulario(
-                    new String[]{
-                        "Especialidad",
-                        "Profesional",
-                        "Lugar de atención",
-                        "Fecha (dd/MM/aaaa)",
-                        "Hora (HH:mm)"
-                    },
-                    especialidad,
-                    profesional,
-                    lugar,
-                    fecha,
-                    inicio
-            );
-        }
-
-        if (!aceptar(
-                franja ? "Generar horarios" : "Crear horario",
-                formulario)) {
+        if (!aceptar("Generar turnos", formulario)) {
             return;
         }
 
         if (profesional.getSelectedItem() == null
                 || lugar.getSelectedItem() == null) {
 
-            throw new SQLException(
+            throw new IllegalArgumentException(
                     "Seleccioná un profesional y un lugar."
             );
         }
 
-        int idProfesional =
-                idDe(profesional.getSelectedItem().toString());
+        int idProfesional = idDe(
+                profesional.getSelectedItem().toString()
+        );
 
-        int idLugar =
-                idDe(lugar.getSelectedItem().toString());
+        int idLugar = idDe(
+                lugar.getSelectedItem().toString()
+        );
 
-        LocalDate dia =
-                LocalDate.parse(valor(fecha), FECHA);
+        LocalDate dia = LocalDate.parse(
+                valor(fecha), FECHA
+        );
 
-        LocalTime desde =
-                LocalTime.parse(valor(inicio));
+        LocalTime desde = LocalTime.parse(
+                valor(horaInicio)
+        );
 
-        if (franja) {
+        LocalTime hasta = LocalTime.parse(
+                valor(horaFin)
+        );
 
-            int cantidad =
-                    controlador.generarDisponibilidades(
-                            idProfesional,
-                            idLugar,
-                            dia,
-                            desde,
-                            LocalTime.parse(valor(fin)),
-                            Integer.parseInt(valor(duracion))
-                    );
-
-            aviso("Se crearon " + cantidad + " horarios.");
-
-        } else {
-
-            controlador.crearDisponibilidad(
-                    idProfesional,
-                    idLugar,
-                    dia,
-                    desde
+        if (dia.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "No se pueden generar turnos en fechas anteriores."
             );
-
-            aviso("Horario creado correctamente.");
         }
 
+        if (!hasta.isAfter(desde)) {
+            throw new IllegalArgumentException(
+                    "La hora de finalización debe ser posterior "
+                    + "a la hora de inicio."
+            );
+        }
+
+        if (dia.equals(LocalDate.now())
+                && !desde.isAfter(LocalTime.now())) {
+
+            throw new IllegalArgumentException(
+                    "La hora de inicio debe ser posterior "
+                    + "a la hora actual."
+            );
+        }
+
+        String intervaloElegido =
+                intervalo.getSelectedItem().toString();
+
+        int minutos = Integer.parseInt(
+                intervaloElegido.replaceAll("[^0-9]", "")
+        );
+
+        int cantidad = controlador.generarDisponibilidades(
+                idProfesional,
+                idLugar,
+                dia,
+                desde,
+                hasta,
+                minutos
+        );
+
         actualizar();
-    }
-    
-private void generarTurnos() throws Exception {
 
-    JComboBox<String> especialidad = combo();
-    JComboBox<String> profesional = combo();
-    JComboBox<String> lugar = combo();
-
-    // Cargar especialidades.
-    for (String item : controlador.listarEspecialidades()) {
-        especialidad.addItem(item);
-    }
-
-    // Cargar lugares de atención.
-    for (String item : controlador.listarLugares()) {
-        lugar.addItem(item);
-    }
-
-    // Mostrar únicamente los profesionales
-    // de la especialidad seleccionada.
-    especialidad.addActionListener(e -> {
-
-        llenarProfesionales(
-                profesional,
-                (String) especialidad.getSelectedItem()
-        );
-    });
-
-    llenarProfesionales(
-            profesional,
-            (String) especialidad.getSelectedItem()
-    );
-
-    // Fecha.
-    JTextField fecha = campo(15);
-
-    fecha.setText(
-            LocalDate.now().plusDays(1).format(FECHA)
-    );
-
-    // Horario de atención.
-    JTextField horaInicio = campo(10);
-    JTextField horaFin = campo(10);
-
-    horaInicio.setText("08:00");
-    horaFin.setText("12:00");
-
-    // Intervalos disponibles.
-    JComboBox<String> intervalo = combo();
-
-    intervalo.addItem("Cada 15 minutos");
-    intervalo.addItem("Cada 20 minutos");
-    intervalo.addItem("Cada 30 minutos");
-    intervalo.addItem("Cada 45 minutos");
-    intervalo.addItem("Cada 60 minutos");
-
-    intervalo.setSelectedItem("Cada 30 minutos");
-
-    // Formulario.
-    JPanel formulario = formulario(
-            new String[]{
-                "Especialidad",
-                "Profesional",
-                "Lugar de atención",
-                "Fecha (dd/MM/aaaa)",
-                "Hora de inicio (HH:mm)",
-                "Hora de finalización (HH:mm)",
-                "Intervalo entre turnos"
-            },
-            especialidad,
-            profesional,
-            lugar,
-            fecha,
-            horaInicio,
-            horaFin,
-            intervalo
-    );
-
-    if (!aceptar("Generar turnos", formulario)) {
-        return;
-    }
-
-    // Validaciones.
-    if (profesional.getSelectedItem() == null) {
-        throw new IllegalArgumentException(
-                "Seleccioná un profesional."
+        aviso(
+                "Generación finalizada.\n\n"
+                + "Fecha: " + dia.format(FECHA)
+                + "\nProfesional: " + profesional.getSelectedItem()
+                + "\nHorario: " + desde + " a " + hasta
+                + "\nIntervalo: " + minutos + " minutos"
+                + "\n\nHorarios generados: " + cantidad
         );
     }
-
-    if (lugar.getSelectedItem() == null) {
-        throw new IllegalArgumentException(
-                "Seleccioná un lugar de atención."
-        );
-    }
-
-    int idProfesional = idDe(
-            profesional.getSelectedItem().toString()
-    );
-
-    int idLugar = idDe(
-            lugar.getSelectedItem().toString()
-    );
-
-    LocalDate dia = LocalDate.parse(
-            valor(fecha),
-            FECHA
-    );
-
-    LocalTime desde = LocalTime.parse(
-            valor(horaInicio)
-    );
-
-    LocalTime hasta = LocalTime.parse(
-            valor(horaFin)
-    );
-
-    if (dia.isBefore(LocalDate.now())) {
-        throw new IllegalArgumentException(
-                "No se pueden generar turnos en fechas anteriores."
-        );
-    }
-
-    if (!hasta.isAfter(desde)) {
-        throw new IllegalArgumentException(
-                "La hora de finalización debe ser posterior "
-                + "a la hora de inicio."
-        );
-    }
-
-    if (dia.equals(LocalDate.now())
-            && !desde.isAfter(LocalTime.now())) {
-
-        throw new IllegalArgumentException(
-                "La hora de inicio debe ser posterior "
-                + "a la hora actual."
-        );
-    }
-
-    // Convertir el intervalo elegido a minutos.
-    String intervaloElegido =
-            intervalo.getSelectedItem().toString();
-
-    int minutos = Integer.parseInt(
-            intervaloElegido.replaceAll("[^0-9]", "")
-    );
-
-    // Generar las disponibilidades.
-    int cantidad = controlador.generarDisponibilidades(
-            idProfesional,
-            idLugar,
-            dia,
-            desde,
-            hasta,
-            minutos
-    );
-
-    actualizar();
-
-    aviso(
-            "Generación finalizada.\n\n"
-            + "Fecha: " + dia.format(FECHA)
-            + "\nProfesional: "
-            + profesional.getSelectedItem()
-            + "\nHorario: " + desde + " a " + hasta
-            + "\nIntervalo: " + minutos + " minutos"
-            + "\n\nHorarios generados: " + cantidad
-    );
-}
-
 
     private void bloquear() throws Exception {
 
@@ -1552,8 +1177,7 @@ private void generarTurnos() throws Exception {
 
         Disponibilidad disponibilidad =
                 listaDisponibilidad.stream()
-                        .filter(d ->
-                                d.getIdDisponibilidad() == id)
+                        .filter(d -> d.getIdDisponibilidad() == id)
                         .findFirst()
                         .orElseThrow();
 
@@ -1577,9 +1201,7 @@ private void generarTurnos() throws Exception {
         actualizar();
     }
 
-    // =====================================================
     // TURNOS
-    // =====================================================
 
     private JPanel panelTurnos() {
 
@@ -1624,6 +1246,8 @@ private void generarTurnos() throws Exception {
         return panel(tablaTurnos, controles);
     }
 
+    // ASIGNACIÓN AUTOMÁTICA DE FECHAS Y HORARIOS
+
     private void asignarTurno() throws Exception {
 
         String dni = JOptionPane.showInputDialog(
@@ -1639,13 +1263,18 @@ private void generarTurnos() throws Exception {
                 controlador.buscarPaciente(dni.trim());
 
         if (paciente == null) {
-
             throw new SQLException(
                     "Paciente no encontrado. Registralo primero."
             );
         }
 
-        // Primero especialidad, después profesional.
+        // Consultar disponibilidades actualizadas.
+
+        listaDisponibilidad =
+                controlador.listarDisponibilidades();
+
+        profesionalesActivos =
+                controlador.listarProfesionales();
 
         JComboBox<String> especialidad = combo();
         JComboBox<String> profesional = combo();
@@ -1656,11 +1285,43 @@ private void generarTurnos() throws Exception {
             especialidad.addItem(item);
         }
 
-        JTextField fecha = campo(15);
+        // Fechas disponibles: selección automática.
 
-        fecha.setText(
-                LocalDate.now().plusDays(1).format(FECHA)
-        );
+        JComboBox<LocalDate> fechas = new JComboBox<>();
+
+        fechas.setFont(FUENTE);
+        fechas.setBackground(Color.WHITE);
+        fechas.setForeground(AZUL);
+        fechas.setPreferredSize(new Dimension(220, 38));
+
+        fechas.setRenderer(new DefaultListCellRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> lista,
+                    Object valor,
+                    int indice,
+                    boolean seleccionado,
+                    boolean foco) {
+
+                JLabel etiqueta =
+                        (JLabel) super.getListCellRendererComponent(
+                                lista,
+                                valor,
+                                indice,
+                                seleccionado,
+                                foco
+                        );
+
+                if (valor instanceof LocalDate dia) {
+                    etiqueta.setText(dia.format(FECHA));
+                }
+
+                return etiqueta;
+            }
+        });
+
+        // Horarios disponibles.
 
         JComboBox<Disponibilidad> horarios =
                 new JComboBox<>();
@@ -1668,10 +1329,7 @@ private void generarTurnos() throws Exception {
         horarios.setFont(FUENTE);
         horarios.setBackground(Color.WHITE);
         horarios.setForeground(AZUL);
-
-        horarios.setPreferredSize(
-                new Dimension(490, 38)
-        );
+        horarios.setPreferredSize(new Dimension(490, 38));
 
         horarios.setRenderer(new DefaultListCellRenderer() {
 
@@ -1692,18 +1350,6 @@ private void generarTurnos() throws Exception {
                                 foco
                         );
 
-                etiqueta.setOpaque(true);
-                etiqueta.setFont(FUENTE);
-                etiqueta.setForeground(AZUL);
-
-                etiqueta.setBackground(
-                        seleccionado ? SELECCION : Color.WHITE
-                );
-
-                etiqueta.setBorder(
-                        new EmptyBorder(7, 10, 7, 10)
-                );
-
                 if (valor instanceof Disponibilidad d) {
 
                     etiqueta.setText(
@@ -1718,94 +1364,154 @@ private void generarTurnos() throws Exception {
         });
 
         JLabel mensaje = new JLabel(
-                "Seleccioná especialidad, profesional y fecha."
+                "Seleccioná un profesional para consultar turnos."
         );
 
         mensaje.setForeground(TURQUESA);
         mensaje.setFont(FUENTE);
 
+        // Evitar eventos intermedios mientras se cargan listas.
+
+        final boolean[] cargandoFechas = {false};
+
+        // Cargar horarios de la fecha seleccionada.
+
         Runnable cargarHorarios = () -> {
+
+            if (cargandoFechas[0]) {
+                return;
+            }
 
             horarios.removeAllItems();
 
-            if (profesional.getSelectedItem() == null) {
+            LocalDate dia =
+                    (LocalDate) fechas.getSelectedItem();
+
+            Object seleccionado =
+                    profesional.getSelectedItem();
+
+            if (seleccionado == null || dia == null) {
 
                 mensaje.setText(
-                        "No hay profesionales para esta especialidad."
+                        "No hay fechas disponibles para este profesional."
                 );
 
                 return;
             }
 
+            int idProfesional =
+                    idDe(seleccionado.toString());
+
+            LocalDateTime ahora = LocalDateTime.now();
+
+            for (Disponibilidad d : listaDisponibilidad) {
+
+                boolean mismoProfesional =
+                        d.getProfesional().getIdProfesional()
+                        == idProfesional;
+
+                boolean mismaFecha =
+                        d.getFecha().equals(dia);
+
+                boolean libre =
+                        "LIBRE".equalsIgnoreCase(
+                                d.getEstado()
+                        );
+
+                boolean futura =
+                        LocalDateTime.of(
+                                d.getFecha(),
+                                d.getHorario()
+                        ).isAfter(ahora);
+
+                if (mismoProfesional
+                        && mismaFecha
+                        && libre
+                        && futura) {
+
+                    horarios.addItem(d);
+                }
+            }
+
+            mensaje.setText(
+                    horarios.getItemCount() == 0
+                    ? "No hay horarios libres para esta fecha."
+                    : "Horarios disponibles: "
+                            + horarios.getItemCount()
+            );
+        };
+
+        // Cargar fechas que realmente tienen horarios libres.
+
+        Runnable cargarFechas = () -> {
+
+            cargandoFechas[0] = true;
+
             try {
 
-                LocalDate dia =
-                        LocalDate.parse(valor(fecha), FECHA);
+                fechas.removeAllItems();
+                horarios.removeAllItems();
+
+                Object seleccionado =
+                        profesional.getSelectedItem();
+
+                if (seleccionado == null) {
+                    mensaje.setText(
+                            "No hay profesionales disponibles."
+                    );
+                    return;
+                }
 
                 int idProfesional =
-                        idDe(profesional
-                                .getSelectedItem()
-                                .toString());
+                        idDe(seleccionado.toString());
 
-                String especialidadSeleccionada =
-                        (String) especialidad.getSelectedItem();
+                Set<LocalDate> dias =
+                        new TreeSet<>();
 
-                for (Disponibilidad disponibilidad
-                        : listaDisponibilidad) {
+                LocalDateTime ahora =
+                        LocalDateTime.now();
+
+                for (Disponibilidad d : listaDisponibilidad) {
 
                     boolean mismoProfesional =
-                            disponibilidad.getProfesional()
+                            d.getProfesional()
                                     .getIdProfesional()
                             == idProfesional;
 
-                    boolean mismaEspecialidad =
-                            especialidadSeleccionada == null
-                            || especialidadSeleccionada.equals("Todas")
-                            || disponibilidad.getProfesional()
-                                    .getEspecialidad()
-                                    .equals(especialidadSeleccionada);
-
-                    boolean mismaFecha =
-                            disponibilidad.getFecha().equals(dia);
-
                     boolean libre =
                             "LIBRE".equalsIgnoreCase(
-                                    disponibilidad.getEstado()
+                                    d.getEstado()
                             );
 
                     boolean futura =
                             LocalDateTime.of(
-                                    disponibilidad.getFecha(),
-                                    disponibilidad.getHorario()
-                            ).isAfter(LocalDateTime.now());
+                                    d.getFecha(),
+                                    d.getHorario()
+                            ).isAfter(ahora);
 
-                    if (mismoProfesional
-                            && mismaEspecialidad
-                            && mismaFecha
-                            && libre
-                            && futura) {
-
-                        horarios.addItem(disponibilidad);
+                    if (mismoProfesional && libre && futura) {
+                        dias.add(d.getFecha());
                     }
                 }
 
-                mensaje.setText(
-                        horarios.getItemCount() == 0
-                        ? "No hay horarios libres para esta selección."
-                        : "Horarios disponibles: "
-                                + horarios.getItemCount()
-                );
+                for (LocalDate dia : dias) {
+                    fechas.addItem(dia);
+                }
 
-            } catch (DateTimeParseException ex) {
+                if (dias.isEmpty()) {
+                    mensaje.setText(
+                            "Este profesional no tiene turnos libres."
+                    );
+                }
 
-                mensaje.setText(
-                        "Ingresá una fecha válida (dd/MM/aaaa)."
-                );
+            } finally {
+                cargandoFechas[0] = false;
             }
+
+            cargarHorarios.run();
         };
 
-        // Cuando cambia la especialidad,
-        // se actualizan los profesionales asociados.
+        // Eventos de selección.
 
         especialidad.addActionListener(e -> {
 
@@ -1814,45 +1520,25 @@ private void generarTurnos() throws Exception {
                     (String) especialidad.getSelectedItem()
             );
 
-            cargarHorarios.run();
+            cargarFechas.run();
         });
 
-        // Cuando cambia el profesional,
-        // se actualizan los horarios disponibles.
-
-        profesional.addActionListener(
-                e -> cargarHorarios.run()
+        profesional.addActionListener(e ->
+                cargarFechas.run()
         );
 
-        fecha.getDocument().addDocumentListener(
-                new javax.swing.event.DocumentListener() {
-
-                    @Override
-                    public void insertUpdate(
-                            javax.swing.event.DocumentEvent e) {
-                        cargarHorarios.run();
-                    }
-
-                    @Override
-                    public void removeUpdate(
-                            javax.swing.event.DocumentEvent e) {
-                        cargarHorarios.run();
-                    }
-
-                    @Override
-                    public void changedUpdate(
-                            javax.swing.event.DocumentEvent e) {
-                        cargarHorarios.run();
-                    }
-                }
+        fechas.addActionListener(e ->
+                cargarHorarios.run()
         );
+
+        // Carga inicial.
 
         llenarProfesionales(
                 profesional,
                 (String) especialidad.getSelectedItem()
         );
 
-        cargarHorarios.run();
+        cargarFechas.run();
 
         JLabel pacienteSeleccionado = new JLabel(
                 paciente.getNombreCompleto()
@@ -1868,14 +1554,14 @@ private void generarTurnos() throws Exception {
                     "Paciente",
                     "Especialidad",
                     "Profesional",
-                    "Fecha (dd/MM/aaaa)",
+                    "Fechas disponibles",
                     "Horario libre",
                     "Disponibilidad"
                 },
                 pacienteSeleccionado,
                 especialidad,
                 profesional,
-                fecha,
+                fechas,
                 horarios,
                 mensaje
         );
@@ -1888,16 +1574,13 @@ private void generarTurnos() throws Exception {
                 (Disponibilidad) horarios.getSelectedItem();
 
         if (seleccionada == null) {
-
             aviso(
                     "No hay horarios libres para la selección."
             );
-
             return;
         }
 
         if (profesional.getSelectedItem() == null) {
-
             throw new SQLException(
                     "Seleccioná un profesional."
             );
@@ -1911,6 +1594,18 @@ private void generarTurnos() throws Exception {
 
             throw new SQLException(
                     "El horario no corresponde al profesional."
+            );
+        }
+
+        LocalDate fechaSeleccionada =
+                (LocalDate) fechas.getSelectedItem();
+
+        if (fechaSeleccionada == null
+                || !seleccionada.getFecha()
+                        .equals(fechaSeleccionada)) {
+
+            throw new SQLException(
+                    "El horario no corresponde a la fecha."
             );
         }
 
@@ -1945,6 +1640,9 @@ private void generarTurnos() throws Exception {
             );
         }
 
+        // El controlador y el servicio vuelven a validar
+        // la disponibilidad al guardar en la base de datos.
+
         controlador.asignarTurno(
                 paciente.getIdPaciente(),
                 seleccionada.getIdDisponibilidad()
@@ -1973,7 +1671,6 @@ private void generarTurnos() throws Exception {
         }
 
         controlador.cancelarTurno(id);
-
         actualizar();
 
         aviso(
@@ -1981,15 +1678,14 @@ private void generarTurnos() throws Exception {
         );
     }
 
-    // =====================================================
     // HISTORIAL
-    // =====================================================
 
     private JPanel panelHistorial() {
 
         JPanel controles = barra();
 
-        accion(controles, "Actualizar", this::actualizar);
+        accion(controles, "Actualizar",
+                this::actualizar);
 
         return panel(tablaHistorial, controles);
     }
@@ -2014,9 +1710,7 @@ private void generarTurnos() throws Exception {
         });
     }
 
-    // =====================================================
     // EXPORTACIÓN CSV
-    // =====================================================
 
     private void exportarCSV() throws Exception {
 
@@ -2033,10 +1727,7 @@ private void generarTurnos() throws Exception {
 
         File archivo = selector.getSelectedFile();
 
-        if (!archivo.getName()
-                .toLowerCase()
-                .endsWith(".csv")) {
-
+        if (!archivo.getName().toLowerCase().endsWith(".csv")) {
             archivo = new File(
                     archivo.getAbsolutePath() + ".csv"
             );
@@ -2114,14 +1805,11 @@ private void generarTurnos() throws Exception {
         aviso(
                 "Archivo CSV guardado en:\n"
                 + archivo.getAbsolutePath()
-                + "\n\nContiene datos personales."
-                + " Protegé el archivo."
+                + "\n\nContiene datos personales. Protegé el archivo."
         );
     }
 
-    // =====================================================
     // IMPRESIÓN / PDF
-    // =====================================================
 
     private void imprimirAgenda() throws Exception {
 
@@ -2134,7 +1822,6 @@ private void generarTurnos() throws Exception {
         );
 
         if (!impreso) {
-
             aviso(
                     "Se canceló la impresión.\n"
                     + "Para guardar un PDF, seleccioná "
@@ -2143,9 +1830,7 @@ private void generarTurnos() throws Exception {
         }
     }
 
-    // =====================================================
     // ACTUALIZACIÓN GENERAL
-    // =====================================================
 
     private void actualizar() {
 
@@ -2170,7 +1855,7 @@ private void generarTurnos() throws Exception {
             listaTurnos =
                     controlador.listarTurnosVigentes();
 
-            // Pacientes
+            // PACIENTES
 
             limpiar(modeloPacientes);
 
@@ -2189,7 +1874,7 @@ private void generarTurnos() throws Exception {
                 });
             }
 
-            // Profesionales
+            // PROFESIONALES
 
             limpiar(modeloProfesionales);
 
@@ -2206,7 +1891,7 @@ private void generarTurnos() throws Exception {
                 });
             }
 
-            // Especialidades
+            // ESPECIALIDADES
 
             cargando = true;
 
@@ -2246,7 +1931,7 @@ private void generarTurnos() throws Exception {
             cargarFiltroProfesionales();
             filtrarDisponibilidad();
 
-            // Turnos vigentes
+            // TURNOS VIGENTES
 
             limpiar(modeloTurnos);
 
@@ -2254,7 +1939,7 @@ private void generarTurnos() throws Exception {
                 filaTurno(modeloTurnos, turno);
             }
 
-            // Historial
+            // HISTORIAL
 
             limpiar(modeloHistorial);
 
