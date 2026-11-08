@@ -1,5 +1,7 @@
 
 # TP4 – Sistema de Gestión de Turnos y Comunicación con Pacientes
+ENLACE A VIDEO SOLICITADO
+https://drive.google.com/drive/folders/10b9mnIi-RHYjl2gW6lc6LXC-_N1xTIR7
 
 **Hospital Área Programa «Dr. Fernando Rocha» – Luis Beltrán, Río Negro**
 
